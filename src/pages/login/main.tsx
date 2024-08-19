@@ -68,7 +68,6 @@ export default function Login() {
       });
       setLoading(false);
     }
-    console.log(values);
   }
 
   const [showPassword, setShowPassword] = useState(false);
