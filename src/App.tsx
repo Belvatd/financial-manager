@@ -4,6 +4,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Dashboard, Login } from "./pages";
 import { AuthProvider } from "./lib/helper/AuthProvider";
 import ProtectedRoute from "./lib/helper/ProtectedRoute";
+import { Books } from "./pages/books";
+import QueryProvider from "./lib/helper/QueryProvider";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +27,14 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      {
+        path: "books",
+        element: (
+          <ProtectedRoute>
+            <Books />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
 ]);
@@ -32,9 +42,11 @@ const router = createBrowserRouter([
 function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <AuthProvider>
-        <RouterProvider router={router} />
-      </AuthProvider>
+      <QueryProvider>
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
+      </QueryProvider>
     </ThemeProvider>
   );
 }
