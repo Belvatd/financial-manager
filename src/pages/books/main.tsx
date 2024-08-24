@@ -83,47 +83,46 @@ export default function Books() {
 
   if (!isLoading) console.log(books);
   return (
-    <div className="h-[100dvh] flex flex-col align-top">
-      <div className="w-[100dvw] flex justify-between">
-        <CardTitle>Books</CardTitle>
-        <div>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline">Open popover</Button>
-            </PopoverTrigger>
-            <PopoverContent align="center">
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-8"
-                >
-                  {formSchema.map((item) => (
-                    <FormField
-                      control={form.control}
-                      name={item.name}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{item.label}</FormLabel>
-                          <FormControl>
-                            <Input
-                              type={item.type}
-                              placeholder={item.placeholder}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  ))}
-                  <Button type="submit" className="w-full">
-                    {isPending ? "Loading..." : "Create"}
-                  </Button>
-                </form>
-              </Form>
-            </PopoverContent>
-          </Popover>
-        </div>
+    <div className="flex w-full justify-between">
+      <CardTitle>Books</CardTitle>
+      <div>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline">Open popover</Button>
+          </PopoverTrigger>
+          <PopoverContent align="end">
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8"
+              >
+                {formSchema.map((item) => (
+                  <FormField
+                    key={item?.name}
+                    control={form.control}
+                    name={item.name}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{item.label}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type={item.type}
+                            placeholder={item.placeholder}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ))}
+                <Button type="submit" className="w-full">
+                  {isPending ? "Loading..." : "Create"}
+                </Button>
+              </form>
+            </Form>
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   );

@@ -65,5 +65,14 @@
   }
   body {
     @apply bg-background text-foreground;
+    @apply min-h-[100dvh]
   }
+}
+
+#root {
+  @apply w-[100dvw]
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
