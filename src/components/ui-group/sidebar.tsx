@@ -28,7 +28,7 @@ const Sidebar = ({
 
   const NavBar = ({ toggleSidebar }: { toggleSidebar: () => void }) => {
     return (
-      <div className="fixed h-[7dvh] top-0 left-0 w-[100dvw] bg-background border-b z-10 flex justify-between items-center p-4">
+      <div className="fixed h-[7dvh] top-0 left-0 w-[100dvw] bg-background border-b z-50 flex justify-between items-center p-4">
         <div className="flex items-center w-full">
           <Button
             variant={"outline"}
@@ -55,7 +55,7 @@ const Sidebar = ({
     <div>
       <NavBar toggleSidebar={toggleSidebar} />
       <div
-        className={`fixed pt-[7dvh] left-0 min-h-[100dvh] bg-background transition-transform transform border-r ${
+        className={`fixed z-40 pt-[7dvh] left-0 min-h-[100dvh] bg-background transition-transform transform border-r ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } ${isMobile ? "w-[40dvw]" : "w-[10dvw]"}`}
       >

@@ -42,6 +42,25 @@ export function useBookFindAll() {
   });
 }
 
+const getBookById = async (id: string) => {
+  const res = await supabaseClient
+    .from("books")
+    .select("*")
+    .eq("id", id)
+    .single();
+  return res.data;
+};
+export function useBookFindById(id: string) {
+  const queryFn = async () => {
+    if (!id) return {};
+    return getBookById(id);
+  };
+  return useQuery({
+    queryKey: ["book", id],
+    queryFn,
+  });
+}
+
 const editBook = async (book: TBookSchema) => {
   const { id, ...rest } = book;
   const res = await supabaseClient

@@ -67,7 +67,7 @@ function App() {
 
   useEffect(() => {
     if (isMobile) setIsSidebarOpen(false);
-    setIsSidebarOpen(true);
+    else setIsSidebarOpen(true);
   }, [isMobile, setIsSidebarOpen]);
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
