@@ -1,50 +1,60 @@
 import "./App.css";
 import { ThemeProvider } from "./components/theme-provider";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Dashboard, Login } from "./pages";
 import { AuthProvider } from "./lib/helper/AuthProvider";
-import ProtectedRoute from "./lib/helper/ProtectedRoute";
-import { Books } from "./pages/books";
 import QueryProvider from "./lib/helper/QueryProvider";
-import Sidebar from "./components/ui-group/sidebar";
-import { useEffect, useState } from "react";
-import { useMediaQuery } from "./lib/helper/useMediaQuery";
+import { useMemo } from "react";
 import LayoutProvider from "./components/layout-provider";
 
-const router = createBrowserRouter([
+const routes = [
   {
-    path: "/",
+    index: true,
+    lazy: async () =>
+      await import("./pages/login").then(({ Login }) => ({
+        Component: Login,
+      })),
+  },
+  {
+    path: "login",
+    lazy: async () =>
+      await import("./pages/login").then(({ Login }) => ({
+        Component: Login,
+      })),
+  },
+  {
+    path: "dashboard",
+    lazy: async () =>
+      await import("./pages/dashboard").then(({ Dashboard }) => {
+        return { Component: Dashboard };
+      }),
+  },
+  {
+    path: "books",
     children: [
       {
-        path: "",
-        element: <Login />,
+        index: true,
+        lazy: async () =>
+          await import("./pages/books").then(({ Books }) => {
+            return {
+              Component: Books,
+            };
+          }),
       },
       {
-        path: "login",
-        element: <Login />,
-      },
-      {
-        path: "dashboard",
-        element: (
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "books",
-        element: (
-          <ProtectedRoute>
-            <Books />
-          </ProtectedRoute>
-        ),
+        path: "sheet/:id",
+        lazy: async () =>
+          await import("./pages/books").then(({ Books }) => {
+            return {
+              Component: Books,
+            };
+          }),
       },
     ],
   },
-]);
+];
 
 const menuList =
-  router.routes[0]?.children
+  routes
     ?.map((route) => {
       if (route.path === "" || route.path === "login") {
         return null;
@@ -59,31 +69,21 @@ const menuList =
     .filter((item) => item !== null) ?? [];
 
 function App() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
-  const isMobile = useMediaQuery(768);
+  const router = useMemo(() => {
+    return createBrowserRouter([
+      {
+        path: "/",
+        element: <LayoutProvider menuList={menuList} />,
+        children: routes,
+      },
+    ]);
+  }, []);
 
-  useEffect(() => {
-    if (isMobile) setIsSidebarOpen(false);
-    else setIsSidebarOpen(true);
-  }, [isMobile, setIsSidebarOpen]);
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <QueryProvider>
         <AuthProvider>
-          <Sidebar
-            isOpen={isSidebarOpen}
-            toggleSidebar={toggleSidebar}
-            isMobile={isMobile}
-            menuList={menuList}
-          />
-          {
-            <LayoutProvider isMobile={isMobile} isSidebarOpen={isSidebarOpen}>
-              <RouterProvider router={router} />
-            </LayoutProvider>
-          }
+          <RouterProvider router={router} />
         </AuthProvider>
       </QueryProvider>
     </ThemeProvider>

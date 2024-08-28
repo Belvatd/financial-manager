@@ -1,9 +1,10 @@
 import { CardTitle } from "@/components/ui/card";
+import ProtectedRoute from "@/lib/helper/ProtectedRoute";
 
 export default function Dashboard() {
   return (
-    <div>
+    <ProtectedRoute>
       <CardTitle>Dashboard</CardTitle>
-    </div>
+    </ProtectedRoute>
   );
 }

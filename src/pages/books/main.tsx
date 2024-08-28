@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { useMemo, useState } from "react";
 import BookFormAdd from "./fragments/BookFormAdd";
 import BookFormEdit from "./fragments/BookFormEdit";
-import { Edit, Trash } from "lucide-react";
+import { Edit, Sheet, Trash } from "lucide-react";
 import DeleteConfirmModal from "./fragments/DeleteConfirmModal";
+import { useNavigate } from "react-router-dom";
+import ProtectedRoute from "@/lib/helper/ProtectedRoute";
 
 export default function Books() {
   const { data: booksData, isLoading } = useBookFindAll();
@@ -17,6 +19,8 @@ export default function Books() {
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+
+  const navigate = useNavigate();
 
   const columns: ColumnDef<TBookSchema>[] = useMemo(
     () => [
@@ -68,22 +72,34 @@ export default function Books() {
                   <Trash />
                 </Button>
               </DeleteConfirmModal>
+              <Button
+                variant={"outline"}
+                onClick={() => navigate(`/books/sheet/${ctx.row.original.id}`)}
+              >
+                <Sheet size={20} />
+              </Button>
             </div>
           );
         },
       },
     ],
-    [bookIdDelete, bookIdEdit, openDeleteModal, openEditModal]
+    [bookIdDelete, bookIdEdit, navigate, openDeleteModal, openEditModal]
   );
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex w-full justify-between items-center">
-        <CardTitle>Books</CardTitle>
-        <BookFormAdd open={openCreateModal} setOpen={setOpenCreateModal}>
-          <Button variant="outline">New Book</Button>
-        </BookFormAdd>
+    <ProtectedRoute>
+      <div className="flex flex-col gap-6">
+        <div className="flex w-full justify-between items-center">
+          <CardTitle>Books</CardTitle>
+          <BookFormAdd open={openCreateModal} setOpen={setOpenCreateModal}>
+            <Button variant="outline">New Book</Button>
+          </BookFormAdd>
+        </div>
+        <DataTable
+          loading={isLoading}
+          columns={columns}
+          data={booksData ?? []}
+        />
       </div>
-      <DataTable loading={isLoading} columns={columns} data={booksData ?? []} />
-    </div>
+    </ProtectedRoute>
   );
 }
