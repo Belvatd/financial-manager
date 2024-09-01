@@ -65,6 +65,20 @@ const routes = [
       },
     ],
   },
+  {
+    path: "category",
+    children: [
+      {
+        index: true,
+        lazy: async () =>
+          await import("./pages").then(({ MasterCategory }) => {
+            return {
+              Component: MasterCategory,
+            };
+          }),
+      },
+    ],
+  },
 ];
 
 const menuList =
