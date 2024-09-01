@@ -10,21 +10,21 @@ const routes = [
   {
     index: true,
     lazy: async () =>
-      await import("./pages/login").then(({ Login }) => ({
+      await import("./pages").then(({ Login }) => ({
         Component: Login,
       })),
   },
   {
     path: "login",
     lazy: async () =>
-      await import("./pages/login").then(({ Login }) => ({
+      await import("./pages").then(({ Login }) => ({
         Component: Login,
       })),
   },
   {
     path: "dashboard",
     lazy: async () =>
-      await import("./pages/dashboard").then(({ Dashboard }) => {
+      await import("./pages").then(({ Dashboard }) => {
         return { Component: Dashboard };
       }),
   },
@@ -34,7 +34,7 @@ const routes = [
       {
         index: true,
         lazy: async () =>
-          await import("./pages/books").then(({ Books }) => {
+          await import("./pages").then(({ Books }) => {
             return {
               Component: Books,
             };
@@ -43,9 +43,23 @@ const routes = [
       {
         path: "sheet/:id",
         lazy: async () =>
-          await import("./pages/books").then(({ Books }) => {
+          await import("./pages").then(({ Books }) => {
             return {
               Component: Books,
+            };
+          }),
+      },
+    ],
+  },
+  {
+    path: "income",
+    children: [
+      {
+        index: true,
+        lazy: async () =>
+          await import("./pages").then(({ MasterIncome }) => {
+            return {
+              Component: MasterIncome,
             };
           }),
       },

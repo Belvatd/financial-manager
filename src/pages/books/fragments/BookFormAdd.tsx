@@ -14,7 +14,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/lib/helper/AuthProvider";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -36,28 +36,27 @@ export default function BookFormAdd({
   const { user } = useAuth();
   const { mutate, isPending, error: errorCreate } = useCreateBook();
 
-  const form = useForm<z.infer<typeof BookSchema>>({
-    resolver: zodResolver(BookSchema),
-    defaultValues: {
+  const formDefaultValues = useMemo(
+    () => ({
       user_id: user?.id ?? "",
       book_name: "",
       description: "",
       start_period: "",
       end_period: "",
-    },
+    }),
+    [user]
+  );
+
+  const form = useForm<z.infer<typeof BookSchema>>({
+    resolver: zodResolver(BookSchema),
+    defaultValues: formDefaultValues,
   });
 
   useEffect(() => {
     if (!open) {
-      form.reset({
-        user_id: user?.id ?? "",
-        book_name: "",
-        description: "",
-        start_period: "",
-        end_period: "",
-      });
+      form.reset(formDefaultValues);
     }
-  }, [form, open, user?.id]);
+  }, [form, formDefaultValues, open]);
 
   async function onSubmit(values: z.infer<typeof BookSchema>) {
     try {
@@ -68,13 +67,7 @@ export default function BookFormAdd({
       throw err;
     } finally {
       setOpen(false);
-      form.reset({
-        user_id: user?.id ?? "",
-        book_name: "",
-        description: "",
-        start_period: "",
-        end_period: "",
-      });
+      form.reset(formDefaultValues);
     }
   }
 

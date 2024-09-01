@@ -8,8 +8,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useBookFindById, useEditBook } from "@/repositories/books/service";
-import { BookSchema } from "@/repositories/books/model";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,58 +21,46 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { useCreateMasterIncome } from "@/repositories/masterIncome/service";
+import { MasterIncomeSchema } from "@/repositories/masterIncome/model";
 
-export default function BookFormEdit({
+export default function MasterIncomeFormAdd({
   children,
-  bookId,
-  setBookId,
   open,
   setOpen,
 }: {
   children: ReactNode;
-  bookId: string;
-  setBookId: (id: string) => void;
   open: boolean;
   setOpen: (open: boolean) => void;
 }) {
   const { user } = useAuth();
-  const { mutate, isPending, error: errorEdit } = useEditBook();
-  const { data: bookData, isLoading: isLoadingData } = useBookFindById(
-    bookId ?? ""
-  );
+  const { mutate, isPending, error: errorCreate } = useCreateMasterIncome();
 
   const formDefaultValues = useMemo(
     () => ({
       user_id: user?.id ?? "",
-      book_name: "",
-      description: "",
-      start_period: "",
-      end_period: "",
+      name: "",
+      nominal: "",
     }),
     [user]
   );
 
-  const form = useForm<z.infer<typeof BookSchema>>({
-    resolver: zodResolver(BookSchema),
+  const form = useForm<z.infer<typeof MasterIncomeSchema>>({
+    resolver: zodResolver(MasterIncomeSchema),
     defaultValues: formDefaultValues,
   });
 
   useEffect(() => {
-    if (bookData && !isLoadingData) {
-      form.reset(bookData);
-    }
-  }, [bookData, form, isLoadingData]);
-
-  useEffect(() => {
     if (!open) {
-      setBookId("");
+      form.reset(formDefaultValues);
     }
-  }, [open, setBookId]);
+  }, [form, formDefaultValues, open]);
 
-  async function onSubmit(values: z.infer<typeof BookSchema>) {
+  async function onSubmit(values: z.infer<typeof MasterIncomeSchema>) {
     try {
-      mutate({ id: bookId, ...values });
-      if (errorEdit) throw errorEdit;
+      const { nominal, ...rest } = values;
+      mutate({ ...rest, nominal: Number(nominal) });
+      if (errorCreate) throw errorCreate;
     } catch (err) {
       console.log(err);
       throw err;
@@ -86,28 +72,16 @@ export default function BookFormEdit({
 
   const formSchema = [
     {
-      name: "book_name" as const,
+      name: "name" as const,
       type: "text",
-      label: "Name",
-      placeholder: "example: August 2024",
+      label: "Income Source Name",
+      placeholder: "example: Salary from Company",
     },
     {
-      name: "description" as const,
+      name: "nominal" as const,
       type: "text",
-      label: "Description (Optional)",
-      placeholder: "Description of your monthly book",
-    },
-    {
-      name: "start_period" as const,
-      type: "date",
-      label: "Start Period",
-      placeholder: "Start Period",
-    },
-    {
-      name: "end_period" as const,
-      type: "date",
-      label: "End Period",
-      placeholder: "End Period",
+      label: "Nominal",
+      placeholder: "0",
     },
   ];
 
@@ -116,7 +90,7 @@ export default function BookFormEdit({
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="w-[90dvw]">
         <DialogHeader>
-          <DialogTitle>Edit Book Detail</DialogTitle>
+          <DialogTitle>Create Income Source</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -142,7 +116,7 @@ export default function BookFormEdit({
               />
             ))}
             <Button type="submit" className="w-full">
-              {isPending ? "Loading..." : "Edit"}
+              {isPending ? "Loading..." : "Create"}
             </Button>
           </form>
         </Form>
