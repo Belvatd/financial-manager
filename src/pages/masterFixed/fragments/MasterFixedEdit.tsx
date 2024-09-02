@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth } from "@/lib/helper/AuthProvider";
 import { ReactNode, useEffect, useMemo } from "react";
 import {
   Dialog,
@@ -21,13 +20,21 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { MasterFixedSchema } from "@/repositories/masterFixed/model";
 import {
-  useEditMasterIncome,
-  useGetMasterIncomeById,
-} from "@/repositories/masterIncome/service";
-import { MasterIncomeSchema } from "@/repositories/masterIncome/model";
+  useEditMasterFixed,
+  useGetMasterFixedById,
+} from "@/repositories/masterFixed/service";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useMasterCategoryFindAll } from "@/repositories/masterCategory/service";
 
-export default function MasterIncomeFormEdit({
+export default function MasterFixedFormEdit({
   children,
   dataId,
   setDataId,
@@ -40,23 +47,23 @@ export default function MasterIncomeFormEdit({
   open: boolean;
   setOpen: (open: boolean) => void;
 }) {
-  const { user } = useAuth();
-  const { mutate, isPending, error: errorEdit } = useEditMasterIncome();
-  const { data, isLoading: isLoadingData } = useGetMasterIncomeById(
+  const { data: categoryData } = useMasterCategoryFindAll();
+  const { mutate, isPending, error: errorEdit } = useEditMasterFixed();
+  const { data, isLoading: isLoadingData } = useGetMasterFixedById(
     dataId ?? ""
   );
 
   const formDefaultValues = useMemo(
     () => ({
-      user_id: user?.id ?? "",
       name: "",
       nominal: "",
+      master_category_id: "",
     }),
-    [user]
+    []
   );
 
-  const form = useForm<z.infer<typeof MasterIncomeSchema>>({
-    resolver: zodResolver(MasterIncomeSchema),
+  const form = useForm<z.infer<typeof MasterFixedSchema>>({
+    resolver: zodResolver(MasterFixedSchema),
     defaultValues: formDefaultValues,
   });
 
@@ -64,7 +71,7 @@ export default function MasterIncomeFormEdit({
     if (data && !isLoadingData) {
       form.reset(data);
     }
-  }, [data, form, isLoadingData, user?.id]);
+  }, [data, form, isLoadingData]);
 
   useEffect(() => {
     if (!open) {
@@ -72,10 +79,10 @@ export default function MasterIncomeFormEdit({
     }
   }, [open, setDataId]);
 
-  async function onSubmit(values: z.infer<typeof MasterIncomeSchema>) {
+  async function onSubmit(values: z.infer<typeof MasterFixedSchema>) {
     try {
       const { nominal, ...rest } = values;
-      mutate({ id: dataId, ...rest, nominal: Number(nominal) });
+      mutate({ ...rest, nominal: Number(nominal) });
       if (errorEdit) throw errorEdit;
     } catch (err) {
       console.log(err);
@@ -86,11 +93,11 @@ export default function MasterIncomeFormEdit({
     }
   }
 
-  const formSchema = [
+  const formInputSchema = [
     {
       name: "name" as const,
       type: "text",
-      label: "Income Source Name",
+      label: "Expense Name",
       placeholder: "example: Salary from Company",
     },
     {
@@ -106,12 +113,12 @@ export default function MasterIncomeFormEdit({
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="w-[90dvw]">
         <DialogHeader>
-          <DialogTitle>Edit Income</DialogTitle>
+          <DialogTitle>Create Expense Category</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {formSchema.map((item) => (
+            {formInputSchema.map((item) => (
               <FormField
                 key={item?.name}
                 control={form.control}
@@ -131,6 +138,30 @@ export default function MasterIncomeFormEdit({
                 )}
               />
             ))}
+            <FormField
+              control={form.control}
+              name="master_category_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select expense category" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {categoryData?.map((item) => (
+                        <SelectItem key={item.id} value={item.id}>
+                          {item.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <Button type="submit" className="w-full">
               {isPending ? "Loading..." : "Edit"}
             </Button>

@@ -79,6 +79,20 @@ const routes = [
       },
     ],
   },
+  {
+    path: "expense",
+    children: [
+      {
+        index: true,
+        lazy: async () =>
+          await import("./pages").then(({ MasterFixedExpense }) => {
+            return {
+              Component: MasterFixedExpense,
+            };
+          }),
+      },
+    ],
+  },
 ];
 
 const menuList =
