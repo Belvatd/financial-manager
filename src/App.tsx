@@ -43,9 +43,9 @@ const routes = [
       {
         path: "sheet/:id",
         lazy: async () =>
-          await import("./pages").then(({ Books }) => {
+          await import("./pages").then(({ Sheet }) => {
             return {
-              Component: Books,
+              Component: Sheet,
             };
           }),
       },

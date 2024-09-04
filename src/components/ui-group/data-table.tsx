@@ -25,7 +25,7 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   loading,
-}: DataTableProps<TData, TValue>) {
+}: Readonly<DataTableProps<TData, TValue>>) {
   const table = useReactTable({
     data,
     columns,
