@@ -10,6 +10,7 @@ import { useMasterIncomeFindAll } from "@/repositories/masterIncome/service";
 import MasterIncomeFormAdd from "./fragments/MasterIncomeFormAdd";
 import MasterIncomeFormEdit from "./fragments/MasterIncomeFormEdit";
 import { TMasterIncomeSchema } from "@/repositories/masterIncome/model";
+import { formatCurrency } from "@/lib/utils";
 
 export default function MasterIncome() {
   const { data: incomeData, isLoading } = useMasterIncomeFindAll();
@@ -28,6 +29,7 @@ export default function MasterIncome() {
       {
         accessorKey: "nominal",
         header: "Nominal",
+        cell: (ctx) => formatCurrency(ctx.row.original.nominal as number),
       },
       {
         accessorKey: "id",

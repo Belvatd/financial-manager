@@ -1,8 +1,6 @@
 import { DataTable } from "@/components/ui-group/data-table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TSheetIncomeSchema } from "@/repositories/sheetIncome/model";
-import { useSheetIncomeFindAll } from "@/repositories/sheetIncome/service";
 import { ColumnDef } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -10,26 +8,28 @@ import DeleteConfirmModal from "./DeleteConfirmModal";
 import { Trash } from "lucide-react";
 import SheetIncomeFormAdd from "./SheetIncomeAdd";
 import { formatCurrency } from "@/lib/utils";
+import { useSheetFixedExpenseFindAll } from "@/repositories/sheetFixedExpense/service";
+import { TSheetFixedExpenseSchema } from "@/repositories/sheetFixedExpense/model";
 
-export default function IncomeTable() {
+export default function FixedExpenseTable() {
   const { id = "" } = useParams();
-  const { data: incomeData, isLoading } = useSheetIncomeFindAll(id);
+  const { data: fixedExpenseData, isLoading } = useSheetFixedExpenseFindAll(id);
 
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [dataIdDelete, setDataIdDelete] = useState<string>();
 
-  const columns: ColumnDef<TSheetIncomeSchema>[] = useMemo(
+  const columns: ColumnDef<TSheetFixedExpenseSchema>[] = useMemo(
     () => [
       {
-        accessorKey: "master_income.name",
-        header: "Income Source Name",
+        accessorKey: "master_fixed.name",
+        header: "Fixed Expense Name",
       },
       {
-        accessorKey: "master_income.nominal",
+        accessorKey: "master_fixed.nominal",
         header: "Nominal",
         cell: (ctx) =>
-          formatCurrency(ctx.row.original.master_income?.nominal as number),
+          formatCurrency(ctx.row.original.master_fixed?.nominal as number),
       },
       {
         accessorKey: "id",
@@ -61,13 +61,13 @@ export default function IncomeTable() {
     <Card>
       <CardHeader>
         <div className="flex justify-between">
-          <CardTitle>Income</CardTitle>
+          <CardTitle>Fixed Expense</CardTitle>
           <SheetIncomeFormAdd
             bookId={id}
             open={openCreateModal}
             setOpen={setOpenCreateModal}
           >
-            <Button variant={"outline"}>Add Income From Variable</Button>
+            <Button variant={"outline"}>Add Fixed Expense From Variable</Button>
           </SheetIncomeFormAdd>
         </div>
       </CardHeader>
@@ -75,7 +75,7 @@ export default function IncomeTable() {
         <DataTable
           loading={isLoading}
           columns={columns}
-          data={(incomeData as TSheetIncomeSchema[]) ?? []}
+          data={(fixedExpenseData as TSheetFixedExpenseSchema[]) ?? []}
         />
       </CardContent>
     </Card>

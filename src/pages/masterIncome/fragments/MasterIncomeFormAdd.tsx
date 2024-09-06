@@ -28,11 +28,11 @@ export default function MasterIncomeFormAdd({
   children,
   open,
   setOpen,
-}: {
+}: Readonly<{
   children: ReactNode;
   open: boolean;
   setOpen: (open: boolean) => void;
-}) {
+}>) {
   const { user } = useAuth();
   const { mutate, isPending, error: errorCreate } = useCreateMasterIncome();
 

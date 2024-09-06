@@ -10,6 +10,7 @@ import { TMasterFixedSchema } from "@/repositories/masterFixed/model";
 import { useMasterFixedFindAll } from "@/repositories/masterFixed/service";
 import MasterFixedFormAdd from "./fragments/MasterFixedAdd";
 import MasterFixedFormEdit from "./fragments/MasterFixedEdit";
+import { formatCurrency } from "@/lib/utils";
 
 export default function MasterFixedExpense() {
   const { data: categoryData, isLoading } = useMasterFixedFindAll();
@@ -28,6 +29,7 @@ export default function MasterFixedExpense() {
       {
         accessorKey: "nominal",
         header: "Nominal",
+        cell: (ctx) => formatCurrency(ctx.row.original.nominal as number),
       },
       {
         accessorKey: "master_category.name",
