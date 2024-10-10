@@ -60,7 +60,11 @@ export default function DeleteConfirmModal({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button className="w-full" onClick={() => onDelete(bookId)}>
+          <Button
+            data-testid="delete-button"
+            className="w-full"
+            onClick={() => onDelete(bookId)}
+          >
             {isPendingDelete ? "Loading..." : "Delete"}
           </Button>
         </DialogFooter>
