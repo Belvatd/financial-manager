@@ -141,4 +141,63 @@ describe("BookFormEdit", () => {
       expect(mockMutate).not.toHaveBeenCalled();
     });
   });
+
+  it("assigns empty string to user_id if no auth user", () => {
+    (useAuth as Mock).mockReturnValue({ user: null });
+
+    render(
+      <BookFormEdit
+        children={<button>Edit Book</button>}
+        bookId="book123"
+        setBookId={mockSetBookId}
+        open={true}
+        setOpen={mockSetOpen}
+      />
+    );
+
+    const userIdInput = screen.getByTestId("user-id") as HTMLInputElement;
+    expect(userIdInput.value).toBe("");
+  });
+
+  it("assigns user_id from auth user in form default values", () => {
+    (useAuth as Mock).mockReturnValue({ user: { id: "user123" } });
+
+    render(
+      <BookFormEdit
+        children={<button>Edit Book</button>}
+        bookId="book123"
+        setBookId={mockSetBookId}
+        open={true}
+        setOpen={mockSetOpen}
+      />
+    );
+
+    const userIdInput = screen.getByTestId("user-id") as HTMLInputElement;
+    expect(userIdInput.value).toBe("user123");
+  });
+
+  it("closes modal after successful form submission", async () => {
+    const mockMutate = vi.fn((_, { onSuccess }) => onSuccess());
+    (useEditBook as Mock).mockReturnValue({
+      mutate: mockMutate,
+      isPending: false,
+      error: null,
+    });
+
+    render(
+      <BookFormEdit
+        children={<button>Edit Book</button>}
+        bookId="book123"
+        setBookId={mockSetBookId}
+        open={true}
+        setOpen={mockSetOpen}
+      />
+    );
+
+    fireEvent.click(screen.getByText("Edit"));
+
+    await waitFor(() => {
+      expect(mockSetOpen).toHaveBeenCalledWith(false);
+    });
+  });
 });

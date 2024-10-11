@@ -121,6 +121,11 @@ export default function BookFormEdit({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <input
+              type="hidden"
+              {...form.register("user_id")}
+              data-testid="user-id"
+            />
             {formSchema.map((item) => (
               <FormField
                 key={item?.name}

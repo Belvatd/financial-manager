@@ -9,6 +9,16 @@ vi.mock("@/lib/helper/AuthProvider", () => ({
   useAuth: vi.fn(),
 }));
 
+vi.mock("@/repositories/books/service", () => ({
+  useCreateBook: vi.fn(() => ({
+    mutate: vi.fn((_, { onError }) => {
+      onError(new Error("Create error"));
+    }),
+    isPending: false,
+    error: null,
+  })),
+}));
+
 const queryClient = new QueryClient();
 
 const mockMutate = vi.fn();
@@ -124,5 +134,143 @@ describe("BookFormAdd Component", () => {
       expect(screen.getByText(/input your end period/i)).toBeInTheDocument();
       expect(mockMutate).not.toHaveBeenCalled();
     });
+  });
+
+  it("assigns empty string to user_id if no auth user", () => {
+    (useAuth as Mock).mockReturnValue({ user: null });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <BookFormAdd open={true} setOpen={vi.fn()}>
+            {null}
+          </BookFormAdd>
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    const userIdInput = screen.getByTestId("user-id") as HTMLInputElement;
+    expect(userIdInput.value).toBe("");
+  });
+
+  it("assigns user_id from auth user in form default values", () => {
+    (useAuth as Mock).mockReturnValue({ user: { id: "user123" } });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <BookFormAdd open={true} setOpen={vi.fn()}>
+            {null}
+          </BookFormAdd>
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    const userIdInput = screen.getByTestId("user-id") as HTMLInputElement;
+    expect(userIdInput.value).toBe("user123");
+  });
+
+  it("resets the form to its default values when the form is closed", async () => {
+    const setOpenMock = vi.fn();
+
+    const { rerender } = render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <BookFormAdd open={true} setOpen={setOpenMock}>
+            {null}
+          </BookFormAdd>
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    fireEvent.change(screen.getByLabelText("Name"), {
+      target: { value: "Test Book" },
+    });
+    fireEvent.change(screen.getByLabelText("Description (Optional)"), {
+      target: { value: "Test Description" },
+    });
+    fireEvent.change(screen.getByLabelText("Start Period"), {
+      target: { value: "2023-01-01" },
+    });
+    fireEvent.change(screen.getByLabelText("End Period"), {
+      target: { value: "2023-12-31" },
+    });
+
+    // Simulate closing the form
+    rerender(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <BookFormAdd open={false} setOpen={setOpenMock}>
+            {null}
+          </BookFormAdd>
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    // Reopen the form
+    rerender(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <BookFormAdd open={true} setOpen={setOpenMock}>
+            {null}
+          </BookFormAdd>
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    await waitFor(() => {
+      expect((screen.getByLabelText("Name") as HTMLInputElement).value).toBe(
+        ""
+      );
+      expect(
+        (screen.getByLabelText("Description (Optional)") as HTMLInputElement)
+          .value
+      ).toBe("");
+      expect(
+        (screen.getByLabelText("Start Period") as HTMLInputElement).value
+      ).toBe("");
+      expect(
+        (screen.getByLabelText("End Period") as HTMLInputElement).value
+      ).toBe("");
+    });
+  });
+
+  it("throws and logs errorCreate when mutate fails", async () => {
+    const setOpenMock = vi.fn();
+    const errorCreate = new Error("Create error");
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <BookFormAdd open={true} setOpen={setOpenMock}>
+            {null}
+          </BookFormAdd>
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    const consoleLogSpy = vi.spyOn(console, "log");
+
+    fireEvent.change(screen.getByLabelText("Name"), {
+      target: { value: "Test Book" },
+    });
+    fireEvent.change(screen.getByLabelText("Description (Optional)"), {
+      target: { value: "Test Description" },
+    });
+    fireEvent.change(screen.getByLabelText("Start Period"), {
+      target: { value: "2023-01-01" },
+    });
+    fireEvent.change(screen.getByLabelText("End Period"), {
+      target: { value: "2023-12-31" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+
+    await waitFor(() => {
+      expect(consoleLogSpy).toHaveBeenCalledWith(errorCreate);
+      expect(setOpenMock).toHaveBeenCalledWith(false);
+    });
+
+    consoleLogSpy.mockRestore();
   });
 });

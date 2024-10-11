@@ -34,7 +34,7 @@ export default function BookFormAdd({
   setOpen: (open: boolean) => void;
 }) {
   const { user } = useAuth();
-  const { mutate, isPending, error: errorCreate } = useCreateBook();
+  const { mutate, isPending } = useCreateBook();
 
   const formDefaultValues = useMemo(
     () => ({
@@ -60,11 +60,12 @@ export default function BookFormAdd({
 
   async function onSubmit(values: z.infer<typeof BookSchema>) {
     try {
-      mutate(values);
-      if (errorCreate) throw errorCreate;
-    } catch (err) {
-      console.log(err);
-      throw err;
+      mutate(values, {
+        onError: (error) => {
+          console.log(error);
+          setOpen(false);
+        },
+      });
     } finally {
       setOpen(false);
       form.reset(formDefaultValues);
@@ -108,6 +109,11 @@ export default function BookFormAdd({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <input
+              type="hidden"
+              {...form.register("user_id")}
+              data-testid="user-id"
+            />
             {formSchema.map((item) => (
               <FormField
                 key={item?.name}
