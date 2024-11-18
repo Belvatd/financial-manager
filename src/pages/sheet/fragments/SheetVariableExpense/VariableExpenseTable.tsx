@@ -6,30 +6,38 @@ import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import { Trash } from "lucide-react";
-import SheetFixedExpenseFormAdd from "./SheetFixedExpenseAdd";
+import SheetVariableExpenseFormAdd from "./SheetVariableExpenseAdd";
 import { formatCurrency } from "@/lib/utils";
-import { useSheetFixedExpenseFindAll } from "@/repositories/sheetFixedExpense/service";
-import { TSheetFixedExpenseSchema } from "@/repositories/sheetFixedExpense/model";
+import { useSheetVariableExpenseFindAll } from "@/repositories/sheetVariableExpense/service";
+import { TSheetVariableExpenseSchema } from "@/repositories/sheetVariableExpense/model";
 
-export default function FixedExpenseTable() {
+export default function VariableExpenseTable() {
   const { id = "" } = useParams();
-  const { data: fixedExpenseData, isLoading } = useSheetFixedExpenseFindAll(id);
+  const { data: variableExpenseData, isLoading } = useSheetVariableExpenseFindAll(id);
 
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [dataIdDelete, setDataIdDelete] = useState<string>();
 
-  const columns: ColumnDef<TSheetFixedExpenseSchema>[] = useMemo(
+  const columns: ColumnDef<TSheetVariableExpenseSchema>[] = useMemo(
     () => [
       {
-        accessorKey: "master_fixed.name",
+        accessorKey: "name",
         header: "Fixed Expense Name",
       },
       {
-        accessorKey: "master_fixed.nominal",
+        accessorKey: "nominal",
         header: "Nominal",
         cell: (ctx) =>
-          formatCurrency(ctx.row.original.master_fixed?.nominal as number),
+          formatCurrency(ctx.row.original.nominal as number),
+      },
+      {
+        accessorKey: "date",
+        header: "Date",
+      },
+      {
+        accessorKey: "master_category.name",
+        header: "Category",
       },
       {
         accessorKey: "id",
@@ -61,21 +69,21 @@ export default function FixedExpenseTable() {
     <Card>
       <CardHeader>
         <div className="flex justify-between">
-          <CardTitle>Fixed Expense</CardTitle>
-          <SheetFixedExpenseFormAdd
+          <CardTitle>Variable Expense</CardTitle>
+          <SheetVariableExpenseFormAdd
             bookId={id}
             open={openCreateModal}
             setOpen={setOpenCreateModal}
           >
-            <Button variant={"outline"}>Add Fixed Expense From Master Data</Button>
-          </SheetFixedExpenseFormAdd>
+            <Button variant={"outline"}>Add Variable Expense</Button>
+          </SheetVariableExpenseFormAdd>
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <DataTable
           loading={isLoading}
           columns={columns}
-          data={(fixedExpenseData as TSheetFixedExpenseSchema[]) ?? []}
+          data={(variableExpenseData as TSheetVariableExpenseSchema[]) ?? []}
         />
       </CardContent>
     </Card>

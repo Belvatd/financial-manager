@@ -26,11 +26,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCreateSheetIncome } from "@/repositories/sheetIncome/service";
-import { useMasterIncomeFindAll } from "@/repositories/masterIncome/service";
-import { SheetIncomeSchema } from "@/repositories/sheetIncome/model";
+import { useCreateSheetFixedExpense } from "@/repositories/sheetFixedExpense/service";
+import { useMasterFixedFindAll } from "@/repositories/masterFixed/service";
+import { SheetFixedExpenseSchema } from "@/repositories/sheetFixedExpense/model";
 
-export default function SheetIncomeFormAdd({
+export default function SheetFixedExpenseFormAdd({
   children,
   open,
   setOpen,
@@ -41,19 +41,19 @@ export default function SheetIncomeFormAdd({
   setOpen: (open: boolean) => void;
   bookId: string;
 }>) {
-  const { mutate, isPending, error: errorCreate } = useCreateSheetIncome();
-  const { data: masterIncomeData } = useMasterIncomeFindAll();
+  const { mutate, isPending, error: errorCreate } = useCreateSheetFixedExpense();
+  const { data: masterFixedExpenseData } = useMasterFixedFindAll();
 
   const formDefaultValues = useMemo(
     () => ({
-      master_income_id: "",
+      master_fixed_id: "",
       book_id: bookId,
     }),
     [bookId]
   );
 
-  const form = useForm<z.infer<typeof SheetIncomeSchema>>({
-    resolver: zodResolver(SheetIncomeSchema),
+  const form = useForm<z.infer<typeof SheetFixedExpenseSchema>>({
+    resolver: zodResolver(SheetFixedExpenseSchema),
     defaultValues: formDefaultValues,
   });
 
@@ -63,9 +63,9 @@ export default function SheetIncomeFormAdd({
     }
   }, [form, formDefaultValues, open]);
 
-  async function onSubmit(values: z.infer<typeof SheetIncomeSchema>) {
+  async function onSubmit(values: z.infer<typeof SheetFixedExpenseSchema>) {
     try {
-      mutate({ book_id: bookId, master_income_id: values.master_income_id });
+      mutate({ book_id: bookId, master_fixed_id: values.master_fixed_id });
       if (errorCreate) throw errorCreate;
     } catch (err) {
       console.log(err);
@@ -81,28 +81,28 @@ export default function SheetIncomeFormAdd({
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="w-[90dvw]">
         <DialogHeader>
-          <DialogTitle>Add Income Source</DialogTitle>
+          <DialogTitle>Attach Fixed Expense Master Data</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
               control={form.control}
-              name="master_income_id"
+              name="master_fixed_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Income Source</FormLabel>
+                  <FormLabel>Fixed Expense Source</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select income source" />
+                        <SelectValue placeholder="Select fixed expense" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {masterIncomeData?.map((item) => (
+                      {masterFixedExpenseData?.map((item) => (
                         <SelectItem key={item.id} value={item.id}>
                           {item.name}
                         </SelectItem>

@@ -1,13 +1,13 @@
-import { useLocation } from "react-router-dom";
 import {
   Breadcrumb,
+  BreadcrumbList,
   BreadcrumbItem,
   BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
+  BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import { Fragment } from "react/jsx-runtime";
+import { useLocation } from "react-router-dom";
 
 export default function BreadcrumbGroup({
   title,
@@ -28,17 +28,17 @@ export default function BreadcrumbGroup({
           return (
             <Fragment key={to}>
               <BreadcrumbItem>
-                <>
-                  <BreadcrumbLink asChild to={to}>
-                    {capitalizeFirstLetter(value)}
-                  </BreadcrumbLink>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbPage>{title}</BreadcrumbPage>
-                </>
+                <BreadcrumbLink asChild to={to}>
+                  {capitalizeFirstLetter(value)}
+                </BreadcrumbLink>
               </BreadcrumbItem>
+              <BreadcrumbSeparator />
             </Fragment>
           );
         })}
+        <BreadcrumbItem>
+          <BreadcrumbPage>{title}</BreadcrumbPage>
+        </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>
   );

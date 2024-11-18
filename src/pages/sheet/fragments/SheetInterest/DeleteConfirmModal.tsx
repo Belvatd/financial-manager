@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useDeleteSheetFixedExpense } from "@/repositories/sheetFixedExpense/service";
+import { useDeleteSheetInterest } from "@/repositories/sheetInterest/service";
 import { ReactNode, useEffect } from "react";
 
 export default function DeleteConfirmModal({
@@ -34,7 +34,7 @@ export default function DeleteConfirmModal({
     mutate: mutateDelete,
     isPending: isPendingDelete,
     error: errorDelete,
-  } = useDeleteSheetFixedExpense();
+  } = useDeleteSheetInterest();
 
   async function onDelete(id: string) {
     try {
@@ -56,7 +56,7 @@ export default function DeleteConfirmModal({
           <DialogTitle>Are you absolutely sure?</DialogTitle>
           <DialogDescription className="pt-4">
             This action cannot be undone. This will permanently delete your
-            fixed expense on this sheet locally and remove your data from our servers.
+            interest data on this sheet locally and remove your data from our servers.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
